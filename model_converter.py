@@ -8,13 +8,10 @@ def load_obj(file_path):
             if line.startswith('v '):
                 vertex = list(map(float, line.split()[1:]))
                 vertices.append(vertex)
-            elif line.startswith('vn '):
-                normal = list(map(float, line.split()[1:]))
-                normals.append(normal)
             elif line.startswith('f '):
                 face = line.split()[1:]
                 face = [list(map(int, vertex.split('/'))) for vertex in face]
-                face = [[f[0] - 1, f[2] - 1] for f in face]
+                face = [face[i][0]-1 for i in range(len(face))]
                 faces.append(face)
 
     return vertices, normals, faces
@@ -22,8 +19,6 @@ def load_obj(file_path):
 def dump_to_file(vertices, normals, faces, output_file):
     with open(output_file, 'w') as file:
         file.write("vertices = " + str(vertices) + "\n")
-
-        file.write("normals = " + str(normals) + "\n")
 
         file.write("faces = " + str(faces) + "\n" + " ")
 
