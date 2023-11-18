@@ -144,7 +144,9 @@ faces = [[4, 13, 10], [12, 8, 11], [13, 4, 2], [8, 12, 3], [8, 3, 6], [8, 6, 7],
 
 
 hideTurtle()
-#speed(1000)
+
+playground = getPlayground()
+playground.enableRepaint(False)
 setPenColor("Black")
 
 r = 0
@@ -156,7 +158,7 @@ while True:
     
     pv = project_vertices(tv, projection_matrix)
     
-    clean()
+    playground.clear()
     for i in sorted(faces, key=poly_sort):
         pos = [pv[i[0]], pv[i[1]], pv[i[2]]]
         avpos = div(add(add(tv[i[0]], tv[i[1]]), tv[i[2]]), 3)
@@ -169,5 +171,5 @@ while True:
             setPenColor(color)
             draw_triangle(pos)
 
-    delay(0)
+    playground.repaint()
     r += 0.01
