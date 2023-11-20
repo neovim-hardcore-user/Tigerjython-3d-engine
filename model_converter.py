@@ -24,8 +24,8 @@ def dump_to_file(vertices, normals, faces, output_file):
 
 
 
-obj_file_path = 'monkey.obj'
+obj_file_path = input('model to use: ')
 loaded_vertices, loaded_normals, loaded_faces = load_obj(obj_file_path)
 
-output_file_path = 'output.py'
+output_file_path = input('file to output to: ')
 dump_to_file(loaded_vertices, loaded_normals, loaded_faces, output_file_path)

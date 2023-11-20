@@ -157,8 +157,7 @@ faces = [[1, 2, 0], [3, 6, 2], [7, 4, 6], [5, 0, 4], [6, 0, 2], [3, 5, 7], [1, 3
  
 
 
-
-#hideTurtle()
+hideTurtle()
 speed(10)
 setPenColor("Black")
 
