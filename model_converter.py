@@ -10,7 +10,7 @@ def load_obj(file_path):
                 vertices.append(vertex)
             elif line.startswith('f '):
                 face = line.split()[1:]
-                face = [list(map(int, vertex.split('/'))) for vertex in face]
+                face = [list(map(int, vertex.split('//'))) for vertex in face]
                 face = [face[i][0]-1 for i in range(len(face))]
                 faces.append(face)
 
