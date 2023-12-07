@@ -150,7 +150,7 @@ while True:
         
         if is_visible(pos):
             color = [n*0.5+0.5 for n in normals[face[3]]]
-
+    
             
             setPenColor(color)
             setFillColor(color)
@@ -158,4 +158,4 @@ while True:
 
     
     playground.repaint()
-    t += 0.001
+    t += 0.01
