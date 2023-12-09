@@ -1,23 +1,20 @@
 import pygame
 from math import *
-from output import *
+from outputmonkeyfullerler import *
 
 
-screen = pygame.display.set_mode((1000, 1000))
+screen = pygame.display.set_mode((1600, 900))
 
-screen_size = 1000
 
-def draw_triangle(pos):
-    setPos(pos[0])
-    startPath()
-    moveTo(pos[1])
-    moveTo(pos[2])
-    #moveTo(pos[0]) #
-    fillPath()
 
-def matrix_multiply(matrix, vector):
-    result = [sum(matrix[i][j] * vector[j] for j in range(len(vector))) for i in range(len(matrix))]
-    return result
+
+def matrix_multiply(mat1, mat2):
+    return [[sum(mat1[i][k] * mat2[k][j] for k in range(4)) for j in range(4)] for i in range(4)]
+
+
+def matrix_vector_multiply(matrix, vector):
+    return [sum(row[j] * vector[j] for j in range(len(vector))) for row in matrix]
+    
     
 def add(vec1, vec2):
     return [x + y for x, y in zip(vec1, vec2)]
@@ -41,13 +38,15 @@ def normalize(vector):
     length = sqrt(sum(x * x for x in vector))
     return [x / length for x in vector] if length != 0 else vector
 
-def perspective_matrix(aspect_ratio, fov_y, near, far):
+ 
+
+def perspective_matrix(aspect_ratio, fov_y, near, far, screen_size):
     tan_half_fov_y = tan(fov_y / 2)
     range_inv = 1 / (far - near)
 
     return [
-        [1 / (aspect_ratio * tan_half_fov_y), 0, 0, 0],
-        [0, 1 / tan_half_fov_y, 0, 0],
+        [screen_size / (aspect_ratio * tan_half_fov_y), 0, 0, 0],
+        [0, screen_size / tan_half_fov_y, 0, 0],
         [0, 0, -(far + near) * range_inv, -2 * far * near * range_inv],
         [0, 0, -1, 0]
     ]
@@ -68,97 +67,59 @@ def scale_matrix(scale_vector):
         [0, 0, 0, 1]
     ]
 
-
-
-
-def project_vertices(vertices, projection_matrix):
-    projected_vertices = []
-    for vertex in vertices:
-        projected_vertex = matrix_multiply(projection_matrix, vertex + [1])
-        scale = (1 / projected_vertex[3]) * screen_size * 3
-        projected_vertices.append([projected_vertex[0]*scale +  screen_size/2, projected_vertex[1]*-scale +  screen_size/2, projected_vertex[2]])
-    return projected_vertices
-
-def translate(vertices, translation_vector):
-    translation_matrix_ = translation_matrix(translation_vector)
-    translated_vertices = [matrix_multiply(translation_matrix_, vertex + [1])[:3] for vertex in vertices]
-    return translated_vertices
-
-def scale(vertices, scale_vector):
-    scale_matrix_ = scale_matrix(scale_vector)
-    scaled_vertices = [matrix_multiply(scale_matrix_, vertex + [1])[:3] for vertex in vertices]
-    return scaled_vertices
-    
-def rotate_x(vertices, theta):
-    rotation_matrix_x = [
+def rotation_matrix_x(theta):
+    return [
         [1, 0, 0, 0],
         [0, cos(theta), -sin(theta), 0],
         [0, sin(theta), cos(theta), 0],
         [0, 0, 0, 1]
     ]
-    return [matrix_multiply(rotation_matrix_x, vertex + [1])[:3] for vertex in vertices]
 
-def rotate_y(vertices, theta):
-    rotation_matrix_y = [
+def rotation_matrix_y(theta):
+    return [
         [cos(theta), 0, sin(theta), 0],
         [0, 1, 0, 0],
         [-sin(theta), 0, cos(theta), 0],
         [0, 0, 0, 1]
     ]
-    return [matrix_multiply(rotation_matrix_y, vertex + [1])[:3] for vertex in vertices]
 
-def rotate_z(vertices, theta):
-    rotation_matrix_z = [
+def rotation_matrix_z(theta):
+    return [
         [cos(theta), -sin(theta), 0, 0],
         [sin(theta), cos(theta), 0, 0],
         [0, 0, 1, 0],
         [0, 0, 0, 1]
     ]
-    return [matrix_multiply(rotation_matrix_z, vertex + [1])[:3] for vertex in vertices]
-
-def rotate(vertices, angles):
-    rx, ry, rz = angles
-    rotated_vertices = rotate_x(vertices, rx)
-    rotated_vertices = rotate_y(rotated_vertices, ry)
-    rotated_vertices = rotate_z(rotated_vertices, rz)
-    return rotated_vertices
     
-def compute_normal(pos):
-    vector1 = sub(pos[0], pos[1])
-    vector2 = sub(pos[2], pos[1])
-    
-    normal = cross_product(vector1, vector2)
-    
-    
-    return normalize(normal)
+def is_visible(pos):
+    return (pos[2][1] - pos[0][1]) * (pos[1][0] - pos[0][0]) < (pos[1][1] - pos[0][1]) * (pos[2][0] - pos[0][0])
 
 def poly_sort(poly):
-    return -(pv[poly[0]][2] + pv[poly[1]][2] + pv[poly[2]][2])
+    return -(tranf_verts[poly[0]][2] + tranf_verts[poly[1]][2] + tranf_verts[poly[2]][2])
 
-projection_matrix = perspective_matrix(1, radians(150), 0.1, 100)
+projection_matrix = perspective_matrix(1, radians(110), 0.01, 100, screen.get_size()[1])
+projection_matrix = matrix_multiply(projection_matrix, scale_matrix([1, -1, 1]))
 
-
-
-
-r = 0
+screen_size = list(screen.get_size()) + [0]
+t = 0
 while True:
-    tv = rotate_y(vertices, r)
-    tv = rotate_x(tv, sin(r * 2)/2)
-    tv = translate(tv, [0, 0, -7])
+    tranf_mat = matrix_multiply(projection_matrix, translation_matrix([0, 0, -3]))
+    tranf_mat = matrix_multiply(tranf_mat, rotation_matrix_x(sin(t*2)/2))
+    tranf_mat = matrix_multiply(tranf_mat, rotation_matrix_y(t))
+
+    tranf_verts = []
+    for vertex in vertices:
+        vert = matrix_vector_multiply(tranf_mat, vertex + [1])
+        tranf_verts.append([vert[v] / vert[3] + screen_size[v]/2 for v in range(0, 3)])
     
-    
-    pv = project_vertices(tv, projection_matrix)
-    
-    screen.fill((255, 255, 255))
-    for i in sorted(faces, key=poly_sort):
-        pos = [pv[i[0]][:2], pv[i[1]][:2], pv[i[2]][:2]]
-        avpos = div(add(add(tv[i[0]], tv[i[1]]), tv[i[2]]), 3)
-        dif = max(dot_product(compute_normal([tv[i[0]], tv[i[1]], tv[i[2]]]), normalize(avpos)), 0.0)
         
-        if dif > 0:
-            dif = dif * 150 + 50
-            color = (dif, 0, 0)
+    screen.fill((255, 255, 255))
+    for face in sorted(faces, key=poly_sort):
+        pos = [tranf_verts[face[tri]][:2] for tri in range(0, 3)]
+        
+        if is_visible(pos):
+            color = [(n*0.5+0.5) * 255 for n in normals[face[3]]]
             pygame.draw.polygon(screen, color, pos, 0)
 
     pygame.display.update()
-    r += 0.005
+    t += 0.01
