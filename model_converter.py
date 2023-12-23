@@ -21,9 +21,31 @@ def load_obj(file_path):
 
 def dump_to_file(vertices, normals, faces, output_file):
     with open(output_file, 'w') as file:
+        """file.write("vertices = []\n")
+        read = 0
+        while read <= len(vertices):
+            file.write("vertices += " + str(vertices[read:][:blockSize]) + "\n")
+            read += blockSize
+
+        file.write("normals = []\n")
+        read = 0
+        while read <= len(normals):
+            file.write("normals += " + str(normals[read:][:blockSize]) + "\n")
+            read += blockSize
+
+        file.write("faces = []\n")
+        read = 0
+        while read <= len(faces):
+            file.write("faces += " + str(faces[read:][:blockSize]) + "\n")
+            read += blockSize"""
         file.write("vertices = " + str(vertices) + "\n")
         file.write("normals = " + str(normals) + "\n")
-        file.write("faces = " + str(faces) + "\n" + " ")
+        file.write("faces = " + str(faces) + "\n")
+        file.write("\n")
+
+
+
+
 
 
 
