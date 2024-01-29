@@ -1,6 +1,6 @@
 import pygame
 from math import *
-from outputbob import *
+from hm import *
 
 
 screen = pygame.display.set_mode((1600, 900))
@@ -103,7 +103,7 @@ projection_matrix = matrix_multiply(projection_matrix, scale_matrix([1, -1, 1]))
 screen_size = list(screen.get_size()) + [0]
 t = 0
 while True:
-    tranf_mat = matrix_multiply(projection_matrix, translation_matrix([0, 0, -15]))
+    tranf_mat = matrix_multiply(projection_matrix, translation_matrix([0, 0, -7]))
     tranf_mat = matrix_multiply(tranf_mat, rotation_matrix_x(sin(t*2)/2))
     tranf_mat = matrix_multiply(tranf_mat, rotation_matrix_y(t))
 
@@ -122,4 +122,4 @@ while True:
             pygame.draw.polygon(screen, color, pos, 0)
 
     pygame.display.update()
-    t += 0.005
+    t += 0.05
